@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Escape Room indovinelli</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #dceeff, #e9e1ff, #fce5ed);
+            font-family: 'Nunito', sans-serif;
+            color: #484568;
+            text-align: center;
+            padding: 30px 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        /* PAGINA INIZIALE */
+
+        #pagina-iniziale {
+            width: 100%;
+            max-width: 650px;
+            margin: auto;
+            background: rgba(255,255,255,0.85);
+            padding: 45px 35px;
+            border-radius: 30px;
+            box-shadow: 0 12px 35px rgba(89,79,140,0.16);
+            border: 3px solid white;
+        }
+
+        .decorazione {
+            font-size: 65px;
+            margin-bottom: 10px;
+        }
+
+        #pagina-iniziale h1 {
+            color: #65549b;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        #pagina-iniziale p {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #68617e;
+            margin-bottom: 30px;
+        }
+
+        .campo {
+            text-align: left;
+            margin: 18px auto;
+            max-width: 400px;
+        }
+
+        .campo label {
+            display: block;
+            font-weight: 800;
+            margin-bottom: 7px;
+            color: #65549b;
+            font-size: 1rem;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #d4c9f2;
+            border-radius: 14px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .campo input:focus {
+            border-color: #8d7bd2;
+            box-shadow: 0 0 0 4px rgba(141,123,210,0.15);
+        }
+
+        .pulsante-inizia {
+            background: linear-gradient(135deg, #8978d2, #b18bdc);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            border-radius: 30px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 25px;
+            box-shadow: 0 7px 18px rgba(105,91,170,0.25);
+            transition: 0.3s;
+        }
+
+        .pulsante-inizia:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 12px 25px rgba(105,91,170,0.3);
+        }
+
+        #errore {
+            color: #e45d83;
+            font-weight: 800;
+            margin-top: 15px;
+            min-height: 25px;
+        }
+
+        /* AREA GIOCO */
+
+        #pagina-gioco {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #titolo-livello {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #65549b;
+            background: rgba(255,255,255,0.85);
+            padding: 12px 35px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 18px rgba(89,79,140,0.12);
+        }
+
+        h1#domanda {
+            font-size: 2rem;
+            font-weight: 800;
+            max-width: 850px;
+            width: 100%;
+            margin: 0 auto 45px auto;
+            line-height: 1.5;
+            color: #514b79;
+            background: rgba(255,255,255,0.78);
+            padding: 30px 35px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(89,79,140,0.12);
+            border: 2px solid rgba(255,255,255,0.9);
+        }
+
+        #area-bottoni {
+            border-collapse: separate;
+            border-spacing: 30px 25px;
+            margin: 0 auto 35px auto;
+            table-layout: fixed;
+        }
+
+        #area-bottoni td {
+            width: 200px;
+            height: 200px;
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        button.scelta {
+            background: rgba(255,255,255,0.96);
+            border: 4px solid #c9bdf0;
+            border-radius: 28px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            box-shadow: 0 9px 22px rgba(105,91,170,0.17);
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.scelta:hover {
+            background: white;
+            border-color: #8d7bd2;
+            transform: translateY(-7px) scale(1.04);
+            box-shadow: 0 16px 30px rgba(104,87,170,0.28);
+        }
+
+        button.scelta:disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        button img {
+            display: block;
+            width: 175px;
+            height: 175px;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.35s ease;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.12));
+        }
+
+        button.scelta:hover img {
+            transform: scale(1.08);
+        }
+
+        #testo {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 15px;
+            min-height: 35px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: #4d5d67;
+        }
+
+        /* SCHERMATA FINALE */
+
+        #pagina-finale {
+            display: none;
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+            background: rgba(255,255,255,0.9);
+            padding: 45px 30px;
+            border-radius: 30px;
+            box-shadow: 0 12px 35px rgba(89,79,140,0.16);
+            border: 3px solid white;
+        }
+
+        #pagina-finale .trofeo {
+            font-size: 90px;
+            margin-bottom: 10px;
+            animation: salta 1.2s infinite alternate;
+        }
+
+        @keyframes salta {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-12px);
+            }
+        }
+
+        #pagina-finale h1 {
+            color: #65549b;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        #nome-vincitore {
+            color: #d477a0;
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 20px 0;
+        }
+
+        #pagina-finale p {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #68617e;
+        }
+
+        .pulsante-ripeti {
+            background: linear-gradient(135deg, #8978d2, #b18bdc);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .pulsante-ripeti:hover {
+            transform: scale(1.05);
+        }
+
+        /* PIE' DI PAGINA */
+
+        #pie-pagina {
+            margin-top: auto;
+            padding: 20px 15px 10px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #65549b;
+            letter-spacing: 1px;
+            border-top: 2px solid rgba(101,84,155,0.25);
+            width: 100%;
+            max-width: 750px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 600px) {
+
+            #pagina-iniziale {
+                padding: 30px 20px;
+            }
+
+            #pagina-iniziale h1,
+            #pagina-finale h1 {
+                font-size: 1.8rem;
+            }
+
+            #nome-vincitore {
+                font-size: 1.5rem;
+            }
+
+            #titolo-livello {
+                font-size: 1.5rem;
+                padding: 10px 22px;
+            }
+
+            h1#domanda {
+                font-size: 1.4rem;
+                max-width: 95%;
+                padding: 22px 18px;
+                margin-bottom: 25px;
+            }
+
+            #area-bottoni {
+                border-spacing: 12px 15px;
+            }
+
+            #area-bottoni td {
+                width: 145px;
+                height: 145px;
+            }
+
+            button.scelta {
+                width: 145px;
+                height: 145px;
+                padding: 9px;
+                border-radius: 22px;
+            }
+
+            button img {
+                width: 125px;
+                height: 125px;
+            }
+
+            #testo {
+                font-size: 19px;
+            }
+
+            #pie-pagina {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 340px) {
+
+            #area-bottoni {
+                border-spacing: 8px 12px;
+            }
+
+            #area-bottoni td {
+                width: 125px;
+                height: 125px;
+            }
+
+            button.scelta {
+                width: 125px;
+                height: 125px;
+            }
+
+            button img {
+                width: 105px;
+                height: 105px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGINA INIZIALE -->
+
+    <section id="pagina-iniziale">
+
+        <div class="decorazione">🧩 ✨</div>
+
+        <h1>Escape Room Indovinelli!</h1>
+
+        <p>
+            Sei pronto a mettere alla prova il tuo intuito?
+            Osserva attentamente le immagini, leggi gli indovinelli
+            e trova la risposta corretta!
+            <br><br>
+            Inserisci il tuo nome e preparati a giocare!
+        </p>
+
+        <div class="campo">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" placeholder="Inserisci il tuo nome">
+        </div>
+
+        <div class="campo">
+            <label for="cognome">Cognome</label>
+            <input type="text" id="cognome" placeholder="Inserisci il tuo cognome">
+        </div>
+
+        <div id="errore"></div>
+
+        <button class="pulsante-inizia" id="inizia">
+            INIZIA IL GIOCO 🚀
+        </button>
+
+    </section>
+
+
+    <!-- AREA DI GIOCO -->
+
+    <section id="pagina-gioco">
+
+        <div id="titolo-livello">INDOVINELLO 1</div>
+
+        <h1 id="domanda">Caricamento...</h1>
+
+        <table id="area-bottoni">
+
+            <tr>
+                <td>
+                    <button class="scelta">
+                        <img id="im1" src="" alt="">
+                    </button>
+                </td>
+
+                <td>
+                    <button class="scelta">
+                        <img id="im2" src="" alt="">
+                    </button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <button class="scelta">
+                        <img id="im3" src="" alt="">
+                    </button>
+                </td>
+
+                <td>
+                    <button class="scelta">
+                        <img id="im4" src="" alt="">
+                    </button>
+                </td>
+            </tr>
+
+        </table>
+
+        <div id="testo"></div>
+
+    </section>
+
+
+    <!-- SCHERMATA FINALE -->
+
+    <section id="pagina-finale">
+
+        <div class="trofeo">🏆</div>
+
+        <h1>GIOCO COMPLETATO!</h1>
+
+        <div id="nome-vincitore"></div>
+
+        <p>
+            Complimenti! Hai superato tutti gli indovinelli
+            e dimostrato di avere un ottimo intuito!
+            <br><br>
+            Sei stato davvero bravissimo!
+        </p>
+
+        <div style="font-size: 40px; margin: 20px;">
+            🎉 🌟 🎊
+        </div>
+
+        <button class="pulsante-ripeti" id="ripeti">
+            GIOCA DI NUOVO 🔄
+        </button>
+
+    </section>
+
+
+    <!-- PIE' DI PAGINA -->
+
+    <footer id="pie-pagina">
+        Cristiano Goto, Zarattini Emily, Christian Mingolla – 4AIT
+    </footer>
+
+
+    <script>
+
+        // DATI DEL GIOCATORE
+
+        var nomeGiocatore = "";
+        var cognomeGiocatore = "";
+
+
+        // ELENCO DEGLI INDOVINELLI
+
+        var indovinelli = [
+
+            {
+                domanda: "Non sono uno scudo, perché non mi limito a difendere. Non sono una corona, perché non rappresento il potere. Sono l’arma che un cavaliere impugna quando affronta il pericolo senza paura. Quale simbolo rappresento?",
+
+                immagini: [
+                    "dinamite.png",
+                    "sword.png",
+                    "charging.png",
+                    "commanding.png"
+                ],
+
+                descrizioni: [
+                    "Dinamite",
+                    "Spada",
+                    "Ricarica",
+                    "Grido di comando"
+                ],
+
+                rispostaGiusta: "sword.png"
+            },
+
+            {
+                domanda: "Non sono una chiave, ma posso aprire un passaggio. Non sono una torcia, ma posso produrre un grande bagliore. Quando esplodo, la mia forza può abbattere anche gli ostacoli più resistenti. Che cosa sono? Osservate attentamente il torrente e cercate il simbolo corretto.",
+
+                immagini: [
+                    "minotaur.png",
+                    "wrecking.png",
+                    "dinamite.png",
+                    "sea.png"
+                ],
+
+                descrizioni: [
+                    "Minotauro",
+                    "Palla demolitrice",
+                    "Dinamite",
+                    "Mostro marino"
+                ],
+
+                rispostaGiusta: "dinamite.png"
+            },
+
+            {
+                domanda: "Non sono il re della savana e non volo nel cielo. Sono grande e potente, vivo nelle foreste e, quando voglio farmi sentire, lancio un urlo fortissimo. La mia voce risuona tra gli alberi e il mio istinto mi guida. Quale animale sono?",
+
+                immagini: [
+                    "minotaur.png",
+                    "sea.png",
+                    "commanding.png",
+                    "gorilla.png"
+                ],
+
+                descrizioni: [
+                    "Minotauro",
+                    "Mostro marino",
+                    "Grido di comando",
+                    "Gorilla"
+                ],
+
+                rispostaGiusta: "gorilla.png"
+            }
+
+        ];
+
+
+        var livelloAttuale = 0;
+        var giocoBloccato = false;
+
+
+        // AVVIO DEL GIOCO
+
+        $("#inizia").click(function() {
+
+            nomeGiocatore = $("#nome").val().trim();
+            cognomeGiocatore = $("#cognome").val().trim();
+
+            if (nomeGiocatore === "" || cognomeGiocatore === "") {
+
+                $("#errore").text("Inserisci sia il nome sia il cognome!");
+
+                return;
+            }
+
+            $("#errore").text("");
+
+            $("#pagina-iniziale").hide();
+
+            $("#pagina-gioco").css("display", "flex");
+
+            livelloAttuale = 0;
+
+            caricaLivello(livelloAttuale);
+
+        });
+
+
+        // CARICAMENTO DI UN INDOVINELLO
+
+        function caricaLivello(indice) {
+
+            var dati = indovinelli[indice];
+
+            $("#titolo-livello").text("INDOVINELLO " + (indice + 1));
+
+            $("#domanda").text(dati.domanda);
+
+            // Caricamento delle immagini
+
+            $("#im1").attr("src", dati.immagini[0]);
+            $("#im2").attr("src", dati.immagini[1]);
+            $("#im3").attr("src", dati.immagini[2]);
+            $("#im4").attr("src", dati.immagini[3]);
+
+            // Aggiornamento delle descrizioni ALT
+
+            $("#im1").attr("alt", dati.descrizioni[0]);
+            $("#im2").attr("alt", dati.descrizioni[1]);
+            $("#im3").attr("alt", dati.descrizioni[2]);
+            $("#im4").attr("alt", dati.descrizioni[3]);
+
+            $("#testo").text("");
+
+            $(".scelta").prop("disabled", false);
+
+            giocoBloccato = false;
+
+        }
+
+
+        // CONTROLLO DELLA RISPOSTA
+
+        $(document).ready(function() {
+
+            $(".scelta").click(function() {
+
+                if (giocoBloccato) {
+                    return;
+                }
+
+                var immagineScelta = $(this).find("img").attr("src");
+
+                var soluzione = indovinelli[livelloAttuale].rispostaGiusta;
+
+                if (immagineScelta === soluzione) {
+
+                    giocoBloccato = true;
+
+                    $(".scelta").prop("disabled", true);
+
+                    $("#testo")
+                        .css("color", "#279b70")
+                        .text("Risposta esatta!");
+
+                    setTimeout(function() {
+
+                        livelloAttuale++;
+
+                        if (livelloAttuale < indovinelli.length) {
+
+                            caricaLivello(livelloAttuale);
+
+                        } else {
+
+                            terminaGioco();
+
+                        }
+
+                    }, 1100);
+
+                } else {
+
+                    $("#testo")
+                        .css("color", "#e45d83")
+                        .text("Risposta sbagliata, riprova!");
+
+                }
+
+            });
+
+
+            // PULSANTE PER RICOMINCIARE
+
+            $("#ripeti").click(function() {
+
+                livelloAttuale = 0;
+                giocoBloccato = false;
+
+                $("#pagina-finale").hide();
+
+                $("#pagina-iniziale").show();
+
+                $("#nome").val("");
+                $("#cognome").val("");
+
+                nomeGiocatore = "";
+                cognomeGiocatore = "";
+
+            });
+
+        });
+
+
+        // FINE DEL GIOCO
+
+        function terminaGioco() {
+
+            $("#pagina-gioco").hide();
+
+            $("#nome-vincitore").text(
+                nomeGiocatore + " " + cognomeGiocatore
+            );
+
+            $("#pagina-finale").css("display", "block");
+
+        }
+
+    </script>
+
+</body>
+</html>
